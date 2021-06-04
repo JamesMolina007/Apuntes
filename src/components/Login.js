@@ -6,6 +6,9 @@ import GoogleLogin from 'react-google-login';
 
 
 function Login(){
+    function cargar(e){
+        e.preventDefault();
+    }
     let history = useHistory();
     const respuestaGoogle=(respuesta)=>{
         var existe = false;

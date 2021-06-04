@@ -39,13 +39,13 @@ body{
     color: rgb(28, 87, 105)
 }
 
-.container{
+.container_p{
     background-image: linear-gradient(to right, rgb(45, 79, 92), rgb(149, 190, 188));
 }
 
 .navbar{
     position: fixed;
-    top:0;
+    /* top:0; */
 }
 
 .lbl{
@@ -54,4 +54,40 @@ body{
 
 .fa-plus-circle{
     margin-right: 3px;
+}
+
+.tag_1{
+    background-color: rgb(77, 111, 150);
+    border: 3px solid white;
+    color: white;
+    border-radius: 30px;
+    margin-left: 3px;
+}
+
+.btn_r{
+    background: none;
+    border-radius: 10px;
+    margin-left: 6px;
+    color: #eee;
+    margin-top: 6px;
+}
+
+.fas{
+    padding: 3px;
+    margin: 3px;
+    color: #eee;
+}
+
+.reacciones{
+    margin: 3px;
+}
+
+.contenerPublicacion{
+    border-radius: 10px;
+}
+
+.barra{
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
