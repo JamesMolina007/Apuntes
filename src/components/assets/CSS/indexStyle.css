@@ -1,0 +1,57 @@
+.barra{
+    background: linear-gradient(to right, #133b4b, #4f7aaa);
+    color: white;
+}
+
+.bg{
+    background-image: url("../images/apunte.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    width: 100%;
+}
+
+body{
+    background: #4b54a5;
+    background: linear-gradient(to right, #161941, #9bcaff);
+}
+
+
+.fa-book{
+    color: #eee;
+    font-size: 30px;
+    transform: rotate(5deg);
+}
+
+@media screen and (min-width: 800px) {
+    .fa-book {
+        font-size: 4em;
+    }
+} 
+
+.bg_2{
+    background-image: url("../images/fondo4k.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    max-width: 100%;
+}
+
+.principal_f{
+    color: rgb(28, 87, 105)
+}
+
+.container{
+    background-image: linear-gradient(to right, rgb(45, 79, 92), rgb(149, 190, 188));
+}
+
+.navbar{
+    position: fixed;
+    top:0;
+}
+
+.lbl{
+    color: #eee;
+}
+
+.fa-plus-circle{
+    margin-right: 3px;
+}
