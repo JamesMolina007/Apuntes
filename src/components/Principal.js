@@ -1,26 +1,11 @@
 import './assets/CSS/indexStyle.css'
+import { useHistory } from 'react-router-dom'
 function Principal(){
-
-    window.onload = function(e){
-        e.preventDefault();
-        console.log("cargando...");
-        const usAct = localStorage.getItem("usuarioActual").split("|");
-        if(localStorage.getItem(usAct[0])){
-            const apuntes = localStorage.getItem(usAct[0]).split(",");
-            for(var i = 0; i < apuntes.length; i++ ){
-                console.log(apuntes[i]);
-            }
-        }
-    }
-    function subir(e){
-        e.preventDefault();
-        const apunte = document.getElementById('apunte').value;
-        const tags = document.getElementById('tags').value;
-        const tiempoTranscurrido = Date.now();
-        const hoy = new Date(tiempoTranscurrido);
-        console.log(hoy.toDateString());
+    let history = useHistory();
+    function append(apunte, hoy, tags, likes, dislikes, subir, correo, usuario, div  ){
+        console.log(apunte + " -> " + hoy + " -> " + tags + " -> " + likes + " -> " + dislikes);
         if(apunte && tags){
-            const contenedor = document.getElementById('contenedor');
+            const contenedor = document.getElementById(div);
             const publicacion = document.createElement('div');
             var carta = document.createElement('div');
             carta.className = "card";
@@ -29,28 +14,24 @@ function Principal(){
             var textoCarta = document.createElement('p');
             textoCarta.className = "card-text";
             textoCarta.innerHTML = apunte;
-            var tag = document.createElement('div');
+            var tag = document.createElement('button');
+            tag.className = "btn mt-2"
             cuerpoCarta.appendChild(textoCarta);
             carta.appendChild(cuerpoCarta);
-            var tagsN = tags.split(",");
-
-            var row = document.createElement('div');
-            row.className = "row g-1 mt-3 text-center";
+            var tagsN = tags.split(";");
             for (var i = 0; i < tagsN.length; i++) {
                 var tag_1 = document.createElement('span');
-                tag_1.className = "tag_1 col";
+                tag_1.className = "tag_1";
                 tag_1.innerHTML = tagsN[i];
                 console.log(tag_1);
-                row.appendChild(tag_1);
-                tag.appendChild(row);
+                tag.appendChild(tag_1);
             }
             publicacion.className = "container container_p rounded w-50 shadow my-3 py-3 contenerPublicacion";
-            const usAct = localStorage.getItem("usuarioActual").split("|");
             var us = document.createElement('label');
             var fa = document.createElement('label');
-            fa.innerHTML = hoy.toDateString();
+            fa.innerHTML = hoy;
             fa.className = "lbl d-block";
-            us.innerHTML = usAct[1];
+            us.innerHTML = usuario;
             us.className = "lbl";
             publicacion.appendChild(us);
             publicacion.appendChild(fa);
@@ -58,10 +39,10 @@ function Principal(){
             publicacion.appendChild(tag);
             var like = document.createElement('button');
             like.className = "btn_r";
-            like.innerHTML = "0";
+            like.innerHTML = likes;
             var dislike = document.createElement('button');
             dislike.className = "btn_r";
-            dislike.innerHTML = "0";
+            dislike.innerHTML = dislikes;
             var img_like = document.createElement('i');
             var img_dislike = document.createElement('i');
             img_like.className = "fas fa-thumbs-up";
@@ -74,22 +55,186 @@ function Principal(){
             reaccion.appendChild(dislike);
             publicacion.appendChild(reaccion);
             contenedor.appendChild(publicacion);
-            if(localStorage.getItem(usAct[0])){      
-                const lista = localStorage.getItem(usAct[0]).split(",");
-                var cadena = (lista.length+1) + "|" + apunte + "|" + hoy.toDateString() + "|" + 0 + "|" + 0;     
-                localStorage.setItem(usAct[0], localStorage.getItem(usAct[0]) + ',' + cadena);
-            }else{
-                var cadena = 1 + "|" + apunte + "|" + hoy.toDateString() + "|" + 0 + "|" + 0;     
-                localStorage.setItem(usAct[0],cadena);
-            }    
-            const ap = document.getElementById('apunte');
-            ap.innerHTML = "";
-            const tg = document.getElementById('tags');
-            tg.innerHTML = "";
+            if(subir){
+                if(localStorage.getItem(correo)){      
+                    const lista = localStorage.getItem(correo).split(",");
+                    var cadena = (lista.length+1) + "|" + apunte + "|" + hoy + "|" + tags + "|" + 0 + "|" + 0;     
+                    localStorage.setItem(correo, localStorage.getItem(correo) + ',' + cadena);
+                }else{
+                    var cadena = 1 + "|" + apunte + "|" + hoy + "|" + tags + "|" + 0 + "|" + 0;     
+                    localStorage.setItem(correo,cadena);
+                }    
+                const ap = document.getElementById('apunte');
+                ap.value = "";
+                const tg = document.getElementsByClassName('tags');
+                tg.value = "";
+            }
         }else{
             window.alert("Llene cada uno de los datos");
         }
+        
     }
+    window.onload = function(e){
+        e.preventDefault();
+        var cell = document.getElementById("miPublicacion");
+        if ( cell.hasChildNodes() ){
+            while ( cell.childNodes.length >= 1 ){
+                cell.removeChild( cell.firstChild );
+            }
+        }
+        console.log("cargando...");
+        const usAct = localStorage.getItem("usuarioActual").split("|");
+        if(localStorage.getItem(usAct[0])){
+            const apuntes = localStorage.getItem(usAct[0]).split(",");
+            for(var i = 0; i < apuntes.length; i++ ){
+                var elementos = apuntes[i].split("|");  
+                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, usAct[0], usAct[1],'miPublicacion');
+            }
+        }
+        const publicacion = document.getElementById("publicacion");
+        publicacion.style.display = "block";
+        const misPublicaciones = document.getElementById("miPublicacion");
+        misPublicaciones.style.display = "block";
+        const otraPublcacion = document.getElementById("otraPublicacion");
+        otraPublcacion.style.display = "none";
+        const otroUsuario = document.getElementById("otroUsuario");
+        otroUsuario.style.display = "none";
+    }
+    function subir(e){
+        e.preventDefault();
+        const apunte = document.getElementById('apunte').value;
+        const tags = document.getElementById('tags').value;
+        const tiempoTranscurrido = Date.now();
+        const hoy = new Date(tiempoTranscurrido);
+        const usAct = localStorage.getItem("usuarioActual").split("|");
+        append(apunte, hoy.toDateString(), tags, 0, 0, true, usAct[0], usAct[1],'miPublicacion');
+    }
+    
+    function cerrarSesion(e){
+        e.preventDefault();
+        history.push("");
+    }
+
+    function busqueda(e){
+        e.preventDefault();
+        var contenedor = document.createElement("div");
+        
+        contenedor.className ="container container_p rounded w-50 shadow my-3 py-3 contenerPublicacion";
+        const usuario = document.getElementById("buscar").value;
+        if(usuario){
+            const publicacion = document.getElementById("publicacion");
+            publicacion.style.display = "none";
+            const misPublicaciones = document.getElementById("miPublicacion");
+            misPublicaciones.style.display = "none";
+
+            const content = document.getElementById("contenedor");
+            const publicaciones = document.getElementById("otraPublicacion");
+            const otras = document.getElementById("otroUsuario");
+
+            content.removeChild(publicaciones);
+            content.removeChild(otras);
+
+            const otraPublicacion = document.createElement("div");
+            otraPublicacion.id ="otraPublicacion";
+            content.appendChild(otraPublicacion);
+
+            const otros = document.createElement("div");
+            otros.id ="otroUsuario";
+            content.appendChild(otros);
+
+            const otraP = document.getElementById("otraPublicacion");
+            const list = document.createElement("div");
+            list.className = "list-group";
+            const label = document.createElement("label");
+            label.className = "lbl d-block";
+
+            const find = document.createElement("label");
+            find.className = "lbl d-block";
+
+            list.appendChild(label);
+            list.appendChild(find);
+            var encontrados = 0;
+            const userInfoG = localStorage.getItem("gmail").split(",");
+            for( var i = 0; i < userInfoG.length; i++ ){
+                var datos = userInfoG[i].split("|");
+                if( datos[0].includes(usuario) || datos[1].includes(usuario) ){
+                    encontrados++;
+                    const usuarioEncontrado = document.createElement("button");
+                    usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
+                    usuarioEncontrado.className = "list-group-item list-group-item-action my-3";
+                    const lbl_Nombre = document.createElement("label");
+                    const lbl_Correo = document.createElement("label");
+                    const br = document.createElement("br");
+                    lbl_Nombre.innerHTML = datos[1];
+                    lbl_Correo.innerHTML = datos[0];
+                    usuarioEncontrado.appendChild(lbl_Nombre);
+                    usuarioEncontrado.appendChild(br);
+                    usuarioEncontrado.appendChild(lbl_Correo);
+                    list.appendChild(usuarioEncontrado);
+                    console.log("Encontrado");
+                }
+            }
+            const userInfo = localStorage.getItem("email").split(",");
+            for( var i = 0; i < userInfo.length; i++ ){
+                var datos = userInfo[i].split("|");
+                if( datos[0].includes(usuario) || datos[1].includes(usuario) ){
+                    encontrados++;
+                    const usuarioEncontrado = document.createElement("button");
+                    usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
+                    usuarioEncontrado.className = "list-group-item list-group-item-action";
+                    const lbl_Nombre = document.createElement("label");
+                    const lbl_Correo = document.createElement("label");
+                    const br = document.createElement("br");
+                    lbl_Nombre.innerHTML = datos[1];
+                    lbl_Correo.innerHTML = datos[0];
+                    usuarioEncontrado.appendChild(lbl_Nombre);
+                    usuarioEncontrado.appendChild(br);
+                    usuarioEncontrado.appendChild(lbl_Correo);
+                    list.appendChild(usuarioEncontrado);
+                    console.log("Encontrado");
+                }
+            }
+            label.innerHTML = "Busqueda para: " + usuario;
+            find.innerHTML = "Resultados Encontrados: " + encontrados;
+            contenedor.appendChild(list);
+            otraP.appendChild(contenedor);
+            const busquedaUs = document.getElementById("buscar")
+            busquedaUs.value = "";
+        }
+    }
+
+    function btn_buscar(e){
+        const content = document.getElementById("contenedor");
+        const publicaciones = document.getElementById("otraPublicacion");
+        const otras = document.getElementById("otroUsuario");
+
+        content.removeChild(publicaciones);
+        content.removeChild(otras);
+
+        const otraPublicacion = document.createElement("div");
+        otraPublicacion.id ="otraPublicacion";
+        content.appendChild(otraPublicacion);
+
+        const otros = document.createElement("div");
+        otros.id ="otroUsuario";
+        content.appendChild(otros);
+        console.log("mostrar lbl...");
+        var boton = document.createElement("button");
+        boton = e;
+        const correo = boton.lastChild.innerHTML;
+        const usuario = boton.firstChild.innerHTML;
+        console.log(correo);
+        const apuntesTodos = localStorage.getItem(correo);
+        if(apuntesTodos){
+            const apunte = apuntesTodos.split(",");
+            for(var i = 0; i < apunte.length; i++ ){
+                const elementos = apunte[i].split("|");
+                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, correo, usuario, "otroUsuario");
+                console.log("hizo append");
+            }
+        }   
+    }
+
     return(
         <div id="contenedor">
             <div className="barra">
@@ -105,32 +250,35 @@ function Principal(){
                         <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item">
-                                    <a className="nav-link active" aria-current="page" href="#">Inicio</a>
+                                    <button className="btn nav-link active" aria-current="page" onClick={window.onload}>Inicio</button>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="#">Mis Apuntes</a>
+                                    <button className="btn nav-link" onClick ={window.onload}>Mis Apuntes</button>
                                 </li>
                                 <li className="nav-item">
                                     <a className="nav-link" href="#" >Etiquetas</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link disabled" href="#" tabIndex="-1" aria-disabled="true">Cerrar Sesión</a>
+                                    <button className="btn nav-link" href="#" tabIndex="-1" onClick={cerrarSesion}>Cerrar Sesión</button>
                                 </li>
                             </ul>
                             <form className="d-flex">
-                                <input className="form-control me-2" type="search" placeholder="Buscar..." aria-label="Search"></input>
-                                <button className="btn btn-outline-success" type="submit">Buscar</button>
+                                <input className="form-control me-2" type="search" placeholder="Buscar..." aria-label="Search" id="buscar"></input>
+                                <button className="btn btn-outline-success" type="submit" onClick={busqueda}>Buscar</button>
                             </form>
                         </div>
                     </div>
                 </nav>
             </div>
-            <div className="container container_p rounded w-50 shadow my-3 py-3 ">
+            <div className="container container_p rounded w-50 shadow my-3 py-3 " id="publicacion">
                 {/* <label className="lbl">nombre</label> */}
                 <textarea className="form-control" rows="1" placeholder="Apunte: react fue creado por desarrolladores de facebook..." id="apunte"></textarea>
-                <input type="text" placeholder="Etiquetas: javascript,react,front end" className="form-control my-2" id="tags"></input>
-                <button className="btn btn-primary" onClick={subir}><i className="fas fa-plus-circle"></i>Subir</button>
+                <input type="text" placeholder="Etiquetas: javascript;react;front end" className="form-control my-2" id="tags"></input>
+                <button className="btn btn-primary bg-blue" onClick={subir}><i className="fas fa-plus-circle"></i>Subir</button>
             </div>
+            <div id="miPublicacion"></div>
+            <div id="otraPublicacion"></div>
+            <div id="otroUsuario"></div>
         </div>
     );
 }

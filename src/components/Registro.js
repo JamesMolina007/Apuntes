@@ -1,13 +1,12 @@
 import React from 'react';
 
 function Registro(){
+    
     function volver(e){
         e.preventDefault();
         window.history.back();
     }
-    function cargar(e){
-        e.preventDefault();
-    }
+    
     function registro(e){
         e.preventDefault();
         const email = document.getElementById('email').value;
