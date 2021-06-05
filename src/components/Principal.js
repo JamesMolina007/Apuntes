@@ -254,10 +254,13 @@ function Principal(){
         boton = e;
         const id = e.id;
         var nPublicacion = 0;
+        var imagen = document.createElement("i");
         if( id.includes("d") ){
             nPublicacion = id.split("d");
+            imagen.className = "fas fa-thumbs-down";
         }else{
             nPublicacion = id.split("l");
+            imagen.className = "fas fa-thumbs-up";
         }
         var reacciones = 0;
         for( var i = 0; i < boton.innerHTML.length; i++ ){
@@ -275,12 +278,46 @@ function Principal(){
         if(!perfil)
             perfil = correo;
         const cadena = correo + "|" + perfil + "|" + id;
+        var encontrado = false;
         if( localStorage.getItem("reacciones") ){
-            localStorage.setItem("reacciones", localStorage.getItem("reacciones") + ',' + cadena);
+            const listaReacciones = localStorage.getItem("reacciones").split(",");
+            for( var i = 0; i < listaReacciones.length; i++){
+                const reaccion = listaReacciones[i].split("|");
+                if(reaccion[0] === correo && reaccion[1] == perfil ){
+                    const reaccionesP = reaccion[2].split(";");
+                    var esta = false;
+                    for( var j = 0; j < reaccionesP.length; j++){
+                        if(reaccionesP[j] === id){
+                            if( reaccionesP[j].includes("d") ){
+                                console.log("El dislike se quita");
+                                console.log("se le resta a la publicacion");
+                                console.log("Se quita del storage");
+                            }else{
+                                console.log("El like se quita");
+                                console.log("se le resta a la publicacion");
+                                console.log("Se quita del storage");
+                            }
+                            esta = true;
+                        }
+                    }
+                    if(!esta){
+                        console.log("Revisar si ya reaccioné");
+                        console.log("Si reaccioné quitar a uno y poner a otro");
+                    }
+                    esta = false;
+                    encontrado = true;
+                }
+            }
+            if(!encontrado){
+                localStorage.setItem("reacciones", localStorage.getItem("reacciones") + ',' + cadena);
+            }
+            // 
         }else{
             localStorage.setItem("reacciones",cadena);
         }
-        boton.innerHTML = reaccionesTotales;
+        boton.innerText = reaccionesTotales;
+        boton.appendChild(imagen);
+        // <i class="fas fa-thumbs-down" aria-hidden="true"></i>
         console.log(reaccionesTotales);
         console.log(perfil);
     }
