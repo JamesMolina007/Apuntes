@@ -2,7 +2,8 @@ import './assets/CSS/indexStyle.css'
 import { useHistory } from 'react-router-dom'
 function Principal(){
     let history = useHistory();
-    function append(apunte, hoy, tags, likes, dislikes, subir, correo, usuario, div  ){
+    var perfil;
+    function append(apunte, hoy, tags, likes, dislikes, subir, correo, usuario, div, idNum  ){
         console.log(apunte + " -> " + hoy + " -> " + tags + " -> " + likes + " -> " + dislikes);
         if(apunte && tags){
             const contenedor = document.getElementById(div);
@@ -40,13 +41,25 @@ function Principal(){
             var like = document.createElement('button');
             like.className = "btn_r";
             like.innerHTML = likes;
+            like.onclick = function() {btn_Reaccion(like);};
             var dislike = document.createElement('button');
             dislike.className = "btn_r";
             dislike.innerHTML = dislikes;
+            dislike.onclick = function() {btn_Reaccion(dislike);};
             var img_like = document.createElement('i');
             var img_dislike = document.createElement('i');
             img_like.className = "fas fa-thumbs-up";
             img_dislike.className = "fas fa-thumbs-down"; 
+            if(subir){
+                if(localStorage.getItem(correo)){      
+                    const idBTN = localStorage.getItem(correo).split(",");
+                    dislike.id = idBTN.length + "d";
+                    like.id = idBTN.length + "l";
+                }
+            }else{
+                dislike.id = idNum + "d";
+                like.id = idNum + "l";
+            }
             like.appendChild(img_like)
             dislike.appendChild(img_dislike);
             var reaccion = document.createElement('div');
@@ -88,7 +101,7 @@ function Principal(){
             const apuntes = localStorage.getItem(usAct[0]).split(",");
             for(var i = 0; i < apuntes.length; i++ ){
                 var elementos = apuntes[i].split("|");  
-                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, usAct[0], usAct[1],'miPublicacion');
+                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, usAct[0], usAct[1],'miPublicacion', i);
             }
         }
         const publicacion = document.getElementById("publicacion");
@@ -107,7 +120,7 @@ function Principal(){
         const tiempoTranscurrido = Date.now();
         const hoy = new Date(tiempoTranscurrido);
         const usAct = localStorage.getItem("usuarioActual").split("|");
-        append(apunte, hoy.toDateString(), tags, 0, 0, true, usAct[0], usAct[1],'miPublicacion');
+        append(apunte, hoy.toDateString(), tags, 0, 0, true, usAct[0], usAct[1],'miPublicacion', 0);
     }
     
     function cerrarSesion(e){
@@ -161,7 +174,7 @@ function Principal(){
                     encontrados++;
                     const usuarioEncontrado = document.createElement("button");
                     usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
-                    usuarioEncontrado.className = "list-group-item list-group-item-action my-3";
+                    usuarioEncontrado.className = "list-group-item list-group-item-action my-1";
                     const lbl_Nombre = document.createElement("label");
                     const lbl_Correo = document.createElement("label");
                     const br = document.createElement("br");
@@ -181,7 +194,7 @@ function Principal(){
                     encontrados++;
                     const usuarioEncontrado = document.createElement("button");
                     usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
-                    usuarioEncontrado.className = "list-group-item list-group-item-action";
+                    usuarioEncontrado.className = "list-group-item list-group-item-action my-1";
                     const lbl_Nombre = document.createElement("label");
                     const lbl_Correo = document.createElement("label");
                     const br = document.createElement("br");
@@ -227,12 +240,49 @@ function Principal(){
         const apuntesTodos = localStorage.getItem(correo);
         if(apuntesTodos){
             const apunte = apuntesTodos.split(",");
+            perfil = correo;
             for(var i = 0; i < apunte.length; i++ ){
                 const elementos = apunte[i].split("|");
-                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, correo, usuario, "otroUsuario");
+                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, correo, usuario, "otroUsuario", i);
                 console.log("hizo append");
             }
         }   
+    }
+
+    function btn_Reaccion(e){
+        var boton = document.createElement("button");
+        boton = e;
+        const id = e.id;
+        var nPublicacion = 0;
+        if( id.includes("d") ){
+            nPublicacion = id.split("d");
+        }else{
+            nPublicacion = id.split("l");
+        }
+        var reacciones = 0;
+        for( var i = 0; i < boton.innerHTML.length; i++ ){
+            if( boton.innerHTML[i] === '<'){
+                i = boton.innerHTML.length
+            }else{
+                reacciones++;
+            }
+
+        }
+        var reaccionesTotales = boton.innerHTML.substring(0,reacciones);
+        reaccionesTotales++;
+        const user = localStorage.getItem("usuarioActual").split("|");
+        const correo = user[0];
+        if(!perfil)
+            perfil = correo;
+        const cadena = correo + "|" + perfil + "|" + id;
+        if( localStorage.getItem("reacciones") ){
+            localStorage.setItem("reacciones", localStorage.getItem("reacciones") + ',' + cadena);
+        }else{
+            localStorage.setItem("reacciones",cadena);
+        }
+        boton.innerHTML = reaccionesTotales;
+        console.log(reaccionesTotales);
+        console.log(perfil);
     }
 
     return(
