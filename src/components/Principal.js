@@ -79,7 +79,7 @@ function Principal(){
                 }    
                 const ap = document.getElementById('apunte');
                 ap.value = "";
-                const tg = document.getElementsByClassName('tags');
+                const tg = document.getElementById('tags');
                 tg.value = "";
             }
         }else{
@@ -97,6 +97,7 @@ function Principal(){
         }
         console.log("cargando...");
         const usAct = localStorage.getItem("usuarioActual").split("|");
+        perfil = usAct[0];
         if(localStorage.getItem(usAct[0])){
             const apuntes = localStorage.getItem(usAct[0]).split(",");
             for(var i = 0; i < apuntes.length; i++ ){
@@ -113,6 +114,7 @@ function Principal(){
         const otroUsuario = document.getElementById("otroUsuario");
         otroUsuario.style.display = "none";
     }
+
     function subir(e){
         e.preventDefault();
         const apunte = document.getElementById('apunte').value;
@@ -131,7 +133,7 @@ function Principal(){
     function busqueda(e){
         e.preventDefault();
         var contenedor = document.createElement("div");
-        
+        perfil = "";
         contenedor.className ="container container_p rounded w-50 shadow my-3 py-3 contenerPublicacion";
         const usuario = document.getElementById("buscar").value;
         if(usuario){
@@ -250,76 +252,163 @@ function Principal(){
     }
 
     function btn_Reaccion(e){
-        var boton = document.createElement("button");
-        boton = e;
         const id = e.id;
         var nPublicacion = 0;
         var imagen = document.createElement("i");
         if( id.includes("d") ){
-            nPublicacion = id.split("d");
+            nPublicacion = id.split("d")[0];
             imagen.className = "fas fa-thumbs-down";
         }else{
-            nPublicacion = id.split("l");
+            nPublicacion = id.split("l")[0];
             imagen.className = "fas fa-thumbs-up";
         }
-        var reacciones = 0;
-        for( var i = 0; i < boton.innerHTML.length; i++ ){
-            if( boton.innerHTML[i] === '<'){
-                i = boton.innerHTML.length
-            }else{
-                reacciones++;
-            }
 
-        }
-        var reaccionesTotales = boton.innerHTML.substring(0,reacciones);
-        reaccionesTotales++;
+
         const user = localStorage.getItem("usuarioActual").split("|");
         const correo = user[0];
         if(!perfil)
             perfil = correo;
-        const cadena = correo + "|" + perfil + "|" + id;
-        var encontrado = false;
-        if( localStorage.getItem("reacciones") ){
-            const listaReacciones = localStorage.getItem("reacciones").split(",");
+        const cadena = perfil + "|" + id;
+        var borrarD = false;
+        var borrarL = false;
+        var borrarD1 = false;
+        var borrarL1 = false;
+        if( localStorage.getItem("reacciones#"+correo) ){
+            const listaReacciones = localStorage.getItem("reacciones#"+correo).split(",");
+            var listaModificada = "";
+            var existente = false;
             for( var i = 0; i < listaReacciones.length; i++){
-                const reaccion = listaReacciones[i].split("|");
-                if(reaccion[0] === correo && reaccion[1] == perfil ){
-                    const reaccionesP = reaccion[2].split(";");
-                    var esta = false;
-                    for( var j = 0; j < reaccionesP.length; j++){
-                        if(reaccionesP[j] === id){
-                            if( reaccionesP[j].includes("d") ){
-                                console.log("El dislike se quita");
-                                console.log("se le resta a la publicacion");
-                                console.log("Se quita del storage");
+                var reaccionesAcum = ""; 
+                const elementosReaccion = listaReacciones[i].split("|");
+                var cambiado = false;
+                if( elementosReaccion[0] == perfil ){
+                    existente = true;
+                    const reaccion_a_usuario = elementosReaccion[1].split(";");
+                    var encontrado = false;
+                    for( var j = 0; j < reaccion_a_usuario.length; j++){
+                        if( id == reaccion_a_usuario[j]){
+                            if(id.includes("d"))
+                                borrarD = true;
+                            else
+                                borrarL = true;
+                            reaccion_a_usuario[j] = "";
+                            encontrado = true;
+                        }else{
+                            var idReaccion = "";
+                            if(reaccion_a_usuario[j].includes("d")){
+                                idReaccion = reaccion_a_usuario[j].split("d");
                             }else{
-                                console.log("El like se quita");
-                                console.log("se le resta a la publicacion");
-                                console.log("Se quita del storage");
+                                idReaccion = reaccion_a_usuario[j].split("l");
                             }
-                            esta = true;
+                            if( idReaccion[0] == nPublicacion[0]){
+                                console.log(idReaccion[0] +"=="+ nPublicacion[0]);
+                                console.log("Antes: " + reaccion_a_usuario[j]);
+                                if(reaccion_a_usuario[j].includes("d")){
+                                    reaccion_a_usuario[j] = idReaccion[0]+"l";
+                                    borrarD1 = true;
+                                }else{
+                                    reaccion_a_usuario[j] = idReaccion[0]+"d";
+                                    borrarL1 = true;
+                                }
+                                console.log("Despues: " + reaccion_a_usuario[j]);
+                                cambiado = true;
+                            }
+                        }
+                        reaccionesAcum += reaccion_a_usuario[j];
+                    }
+                    var reaccionesAcum2 = "";
+                    for( var j = 0; j < reaccionesAcum.length; j++){
+                        reaccionesAcum2 += reaccionesAcum[j];
+                        if(reaccionesAcum[j] == "d" || reaccionesAcum[j] == "l"){
+                            if(j < reaccionesAcum.length -1)
+                                reaccionesAcum2 += ";"
                         }
                     }
-                    if(!esta){
-                        console.log("Revisar si ya reaccioné");
-                        console.log("Si reaccioné quitar a uno y poner a otro");
+                    if(!encontrado && !cambiado){
+                        reaccionesAcum2 += ";" + id;
                     }
-                    esta = false;
-                    encontrado = true;
+                    var nuevaReaccion = perfil + "|" + reaccionesAcum2;
+                    if( reaccionesAcum2.length < 1)
+                        nuevaReaccion = "";
+                    listaModificada += nuevaReaccion;
+                    listaReacciones[i] = listaModificada;
                 }
             }
-            if(!encontrado){
-                localStorage.setItem("reacciones", localStorage.getItem("reacciones") + ',' + cadena);
+            if(!existente){
+                localStorage.setItem("reacciones#"+correo,localStorage.getItem("reacciones#"+correo)+","+cadena);
+            }else if(localStorage.getItem("reacciones#"+correo)){
+                const tamano = localStorage.getItem("reacciones#"+correo).split(",");
+                if(tamano.length < 1){
+                    localStorage.removeItem("reacciones#"+correo);
+                }
+                else
+                    localStorage.setItem("reacciones#"+correo,listaReacciones);
             }
-            // 
         }else{
-            localStorage.setItem("reacciones",cadena);
+            localStorage.setItem("reacciones#"+correo,cadena);
         }
-        boton.innerText = reaccionesTotales;
+        const arreglar = localStorage.getItem("reacciones#"+correo).split(",");
+        var arreglado = "";
+        for(var m = 0; m < arreglar.length; m++){
+            if(arreglar[m]){
+                arreglado += arreglar[m];
+                if( m < arreglar.length - 1 )
+                    arreglado += ",";
+            }
+        }
+        const publicacionesPerfil = localStorage.getItem(perfil).split(",");
+        var acumPublic = "";
+        var like = 0;
+        var disLike = 0;
+        for( var i = 0; i < publicacionesPerfil.length; i++ ){
+            console.log("Publicacion: "+publicacionesPerfil[i] + " nPublicacion: " + nPublicacion);
+            if( i == nPublicacion){
+                console.log("Entra: "+publicacionesPerfil[nPublicacion]);
+                const publicacionPerfil = publicacionesPerfil[nPublicacion];
+                const elementosPublicacionPerfil = publicacionPerfil.split("|");
+                disLike = elementosPublicacionPerfil[5];
+                like = elementosPublicacionPerfil[4];
+                if(id.includes("d"))
+                    disLike++;
+                else
+                    like++;
+                if(borrarL)
+                    like-=2;
+                if(borrarD)
+                    disLike-=2;
+                if(borrarL1)
+                    like--;
+                if(borrarD1)
+                    disLike--;
+                publicacionesPerfil[i] = elementosPublicacionPerfil[0] + "|" + elementosPublicacionPerfil[1] + "|"+elementosPublicacionPerfil[2]+"|"+elementosPublicacionPerfil[3]+"|"+like+"|"+disLike;
+            }
+            acumPublic += publicacionesPerfil[i];
+            if(i < publicacionesPerfil.length - 1){
+                acumPublic += ",";
+            }
+        }
+        var boton = document.createElement("button");
+        var otroBoton = "";
+        var imagenOtra = document.createElement("i");
+        boton = e;
+        if(boton.id.includes("l")){
+            boton.innerText = like;
+            otroBoton = boton.parentNode.lastChild;
+            imagenOtra.className = "fas fa-thumbs-down";
+        }else{
+            boton.innerText = disLike;
+            otroBoton = boton.parentNode.firstChild;
+            imagenOtra.className = "fas fa-thumbs-up";
+        }
+        if(otroBoton.id.includes("d"))
+            otroBoton.innerText = disLike;
+        else
+            otroBoton.innerText = like;
+        console.log(boton);
+        localStorage.setItem(perfil,acumPublic);
+        localStorage.setItem("reacciones#"+correo,arreglado);
         boton.appendChild(imagen);
-        // <i class="fas fa-thumbs-down" aria-hidden="true"></i>
-        console.log(reaccionesTotales);
-        console.log(perfil);
+        otroBoton.appendChild(imagenOtra);
     }
 
     return(
@@ -358,7 +447,6 @@ function Principal(){
                 </nav>
             </div>
             <div className="container container_p rounded w-50 shadow my-3 py-3 " id="publicacion">
-                {/* <label className="lbl">nombre</label> */}
                 <textarea className="form-control" rows="1" placeholder="Apunte: react fue creado por desarrolladores de facebook..." id="apunte"></textarea>
                 <input type="text" placeholder="Etiquetas: javascript;react;front end" className="form-control my-2" id="tags"></input>
                 <button className="btn btn-primary bg-blue" onClick={subir}><i className="fas fa-plus-circle"></i>Subir</button>
