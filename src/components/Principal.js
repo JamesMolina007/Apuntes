@@ -66,6 +66,33 @@ function Principal(){
             reaccion.className = "reacciones";
             reaccion.appendChild(like);
             reaccion.appendChild(dislike);
+
+            const usuarioAct = localStorage.getItem("usuarioActual").split("|");
+            const listaReaccion = localStorage.getItem("reacciones#"+ usuarioAct[0]).split(",");
+            for( var m = 0; m < listaReaccion.length; m++ ){
+                var perfilReaccion = listaReaccion[m].split("|");
+                if(perfilReaccion[0] == perfil){
+                    const reaccionesR = perfilReaccion[1].split(";");
+                    for( var n = 0; n < reaccionesR.length; n++ ){
+                        var reaccionR = "";
+                        if(reaccionesR[n].includes("d")){
+                            reaccionR = reaccionesR[n].split("d")[0];
+                        }
+                        else{
+                            reaccionR = reaccionesR[n].split("l")[0];
+                        }
+                        if(reaccionR == idNum){
+                            if(reaccionesR[n].includes("d"))
+                                dislike.style.background = "rgb(194, 30, 30)";
+                            else
+                                like.style.background = "rgb(18, 20, 128)";
+                        }
+                    }
+                    if(idNum)
+                    m = listaReaccion.length;
+                }
+            }
+
             publicacion.appendChild(reaccion);
             contenedor.appendChild(publicacion);
             if(subir){
@@ -85,7 +112,6 @@ function Principal(){
         }else{
             window.alert("Llene cada uno de los datos");
         }
-        
     }
     window.onload = function(e){
         e.preventDefault();
@@ -395,16 +421,18 @@ function Principal(){
             boton.innerText = like;
             otroBoton = boton.parentNode.lastChild;
             imagenOtra.className = "fas fa-thumbs-down";
+            boton.style.background = "rgb(18, 20, 128)";
         }else{
             boton.innerText = disLike;
+            boton.style.background = "rgb(194, 30, 30)";
             otroBoton = boton.parentNode.firstChild;
             imagenOtra.className = "fas fa-thumbs-up";
         }
+        otroBoton.style.background = "rgb(77, 111, 150)";
         if(otroBoton.id.includes("d"))
             otroBoton.innerText = disLike;
         else
             otroBoton.innerText = like;
-        console.log(boton);
         localStorage.setItem(perfil,acumPublic);
         localStorage.setItem("reacciones#"+correo,arreglado);
         boton.appendChild(imagen);
