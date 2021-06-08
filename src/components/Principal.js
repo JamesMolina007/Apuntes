@@ -3,8 +3,8 @@ import { useHistory } from 'react-router-dom'
 function Principal(){
     let history = useHistory();
     var perfil;
+
     function append(apunte, hoy, tags, likes, dislikes, subir, correo, usuario, div, idNum  ){
-        console.log(apunte + " -> " + hoy + " -> " + tags + " -> " + likes + " -> " + dislikes);
         if(apunte && tags){
             const contenedor = document.getElementById(div);
             const publicacion = document.createElement('div');
@@ -15,18 +15,8 @@ function Principal(){
             var textoCarta = document.createElement('p');
             textoCarta.className = "card-text";
             textoCarta.innerHTML = apunte;
-            var tag = document.createElement('button');
-            tag.className = "btn mt-2"
             cuerpoCarta.appendChild(textoCarta);
             carta.appendChild(cuerpoCarta);
-            var tagsN = tags.split(";");
-            for (var i = 0; i < tagsN.length; i++) {
-                var tag_1 = document.createElement('span');
-                tag_1.className = "tag_1";
-                tag_1.innerHTML = tagsN[i];
-                console.log(tag_1);
-                tag.appendChild(tag_1);
-            }
             publicacion.className = "container container_p rounded w-50 shadow my-3 py-3 contenerPublicacion";
             var us = document.createElement('label');
             var fa = document.createElement('label');
@@ -37,7 +27,17 @@ function Principal(){
             publicacion.appendChild(us);
             publicacion.appendChild(fa);
             publicacion.appendChild(carta);
-            publicacion.appendChild(tag);
+            var tagsN = tags.split(";");
+            for (var i = 0; i < tagsN.length; i++) {
+                const tag = document.createElement('button');
+                tag.className = "btn p-0 my-3";
+                var tag_1 = document.createElement('span');
+                tag_1.className = "tag_1";
+                tag_1.innerHTML = tagsN[i];
+                tag.appendChild(tag_1);
+                tag.onclick = function(){buscarEtiqueta(tag);};
+                publicacion.appendChild(tag);
+            }
             var like = document.createElement('button');
             like.className = "btn_r";
             like.innerHTML = likes;
@@ -68,28 +68,30 @@ function Principal(){
             reaccion.appendChild(dislike);
 
             const usuarioAct = localStorage.getItem("usuarioActual").split("|");
-            const listaReaccion = localStorage.getItem("reacciones#"+ usuarioAct[0]).split(",");
-            for( var m = 0; m < listaReaccion.length; m++ ){
-                var perfilReaccion = listaReaccion[m].split("|");
-                if(perfilReaccion[0] == perfil){
-                    const reaccionesR = perfilReaccion[1].split(";");
-                    for( var n = 0; n < reaccionesR.length; n++ ){
-                        var reaccionR = "";
-                        if(reaccionesR[n].includes("d")){
-                            reaccionR = reaccionesR[n].split("d")[0];
+            if(localStorage.getItem("reacciones#"+ usuarioAct[0])){
+                const listaReaccion = localStorage.getItem("reacciones#"+ usuarioAct[0]).split(",");
+                for( var m = 0; m < listaReaccion.length; m++ ){
+                    var perfilReaccion = listaReaccion[m].split("|");
+                    if(perfilReaccion[0] == perfil){
+                        const reaccionesR = perfilReaccion[1].split(";");
+                        for( var n = 0; n < reaccionesR.length; n++ ){
+                            var reaccionR = "";
+                            if(reaccionesR[n].includes("d")){
+                                reaccionR = reaccionesR[n].split("d")[0];
+                            }
+                            else{
+                                reaccionR = reaccionesR[n].split("l")[0];
+                            }
+                            if(reaccionR == idNum){
+                                if(reaccionesR[n].includes("d"))
+                                    dislike.style.background = "rgb(194, 30, 30)";
+                                else
+                                    like.style.background = "rgb(18, 20, 128)";
+                            }
                         }
-                        else{
-                            reaccionR = reaccionesR[n].split("l")[0];
-                        }
-                        if(reaccionR == idNum){
-                            if(reaccionesR[n].includes("d"))
-                                dislike.style.background = "rgb(194, 30, 30)";
-                            else
-                                like.style.background = "rgb(18, 20, 128)";
-                        }
+                        if(idNum)
+                        m = listaReaccion.length;
                     }
-                    if(idNum)
-                    m = listaReaccion.length;
                 }
             }
 
@@ -113,6 +115,7 @@ function Principal(){
             window.alert("Llene cada uno de los datos");
         }
     }
+
     window.onload = function(e){
         e.preventDefault();
         var cell = document.getElementById("miPublicacion");
@@ -121,7 +124,6 @@ function Principal(){
                 cell.removeChild( cell.firstChild );
             }
         }
-        console.log("cargando...");
         const usAct = localStorage.getItem("usuarioActual").split("|");
         perfil = usAct[0];
         if(localStorage.getItem(usAct[0])){
@@ -131,6 +133,12 @@ function Principal(){
                 append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, usAct[0], usAct[1],'miPublicacion', i);
             }
         }
+        const contenedorMayor = document.getElementById("contenedor");
+        var publicacionE = document.getElementById("publicacionEtiqueta");
+        contenedorMayor.removeChild(publicacionE);
+        var publicacionEtiqueta = document.createElement("div");
+        publicacionEtiqueta.id="publicacionEtiqueta";
+        contenedorMayor.appendChild(publicacionEtiqueta);
         const publicacion = document.getElementById("publicacion");
         publicacion.style.display = "block";
         const misPublicaciones = document.getElementById("miPublicacion");
@@ -139,6 +147,8 @@ function Principal(){
         otraPublcacion.style.display = "none";
         const otroUsuario = document.getElementById("otroUsuario");
         otroUsuario.style.display = "none";
+        const tagses = document.getElementById("tagsForm");
+        tagses.style.display = "none";
     }
 
     function subir(e){
@@ -170,18 +180,31 @@ function Principal(){
 
             const content = document.getElementById("contenedor");
             const publicaciones = document.getElementById("otraPublicacion");
+            const tages = document.getElementById("tagsForm");
             const otras = document.getElementById("otroUsuario");
 
+
+            const otrosTages = document.getElementById("publicacionEtiqueta");
+            content.removeChild(otrosTages);
+            const otrosTags = document.createElement("div");
+            otrosTags.id ="publicacionEtiqueta";    
+            content.appendChild(otrosTags);
             content.removeChild(publicaciones);
+            content.removeChild(tages);
             content.removeChild(otras);
 
             const otraPublicacion = document.createElement("div");
             otraPublicacion.id ="otraPublicacion";
             content.appendChild(otraPublicacion);
 
+            const taggs = document.createElement("div");
+            taggs.id ="tagsForm";
+            content.appendChild(taggs);
+
             const otros = document.createElement("div");
             otros.id ="otroUsuario";
             content.appendChild(otros);
+
 
             const otraP = document.getElementById("otraPublicacion");
             const list = document.createElement("div");
@@ -212,7 +235,6 @@ function Principal(){
                     usuarioEncontrado.appendChild(br);
                     usuarioEncontrado.appendChild(lbl_Correo);
                     list.appendChild(usuarioEncontrado);
-                    console.log("Encontrado");
                 }
             }
             const userInfo = localStorage.getItem("email").split(",");
@@ -232,7 +254,6 @@ function Principal(){
                     usuarioEncontrado.appendChild(br);
                     usuarioEncontrado.appendChild(lbl_Correo);
                     list.appendChild(usuarioEncontrado);
-                    console.log("Encontrado");
                 }
             }
             label.innerHTML = "Busqueda para: " + usuario;
@@ -256,15 +277,15 @@ function Principal(){
         otraPublicacion.id ="otraPublicacion";
         content.appendChild(otraPublicacion);
 
+        
+
         const otros = document.createElement("div");
         otros.id ="otroUsuario";
         content.appendChild(otros);
-        console.log("mostrar lbl...");
         var boton = document.createElement("button");
         boton = e;
         const correo = boton.lastChild.innerHTML;
         const usuario = boton.firstChild.innerHTML;
-        console.log(correo);
         const apuntesTodos = localStorage.getItem(correo);
         if(apuntesTodos){
             const apunte = apuntesTodos.split(",");
@@ -272,7 +293,6 @@ function Principal(){
             for(var i = 0; i < apunte.length; i++ ){
                 const elementos = apunte[i].split("|");
                 append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5], false, correo, usuario, "otroUsuario", i);
-                console.log("hizo append");
             }
         }   
     }
@@ -288,8 +308,6 @@ function Principal(){
             nPublicacion = id.split("l")[0];
             imagen.className = "fas fa-thumbs-up";
         }
-
-
         const user = localStorage.getItem("usuarioActual").split("|");
         const correo = user[0];
         if(!perfil)
@@ -327,8 +345,6 @@ function Principal(){
                                 idReaccion = reaccion_a_usuario[j].split("l");
                             }
                             if( idReaccion[0] == nPublicacion[0]){
-                                console.log(idReaccion[0] +"=="+ nPublicacion[0]);
-                                console.log("Antes: " + reaccion_a_usuario[j]);
                                 if(reaccion_a_usuario[j].includes("d")){
                                     reaccion_a_usuario[j] = idReaccion[0]+"l";
                                     borrarD1 = true;
@@ -336,7 +352,6 @@ function Principal(){
                                     reaccion_a_usuario[j] = idReaccion[0]+"d";
                                     borrarL1 = true;
                                 }
-                                console.log("Despues: " + reaccion_a_usuario[j]);
                                 cambiado = true;
                             }
                         }
@@ -387,9 +402,7 @@ function Principal(){
         var like = 0;
         var disLike = 0;
         for( var i = 0; i < publicacionesPerfil.length; i++ ){
-            console.log("Publicacion: "+publicacionesPerfil[i] + " nPublicacion: " + nPublicacion);
             if( i == nPublicacion){
-                console.log("Entra: "+publicacionesPerfil[nPublicacion]);
                 const publicacionPerfil = publicacionesPerfil[nPublicacion];
                 const elementosPublicacionPerfil = publicacionPerfil.split("|");
                 disLike = elementosPublicacionPerfil[5];
@@ -433,10 +446,138 @@ function Principal(){
             otroBoton.innerText = disLike;
         else
             otroBoton.innerText = like;
+        if(borrarD || borrarL)
+            boton.style.background = "rgb(77, 111, 150)";
         localStorage.setItem(perfil,acumPublic);
         localStorage.setItem("reacciones#"+correo,arreglado);
         boton.appendChild(imagen);
         otroBoton.appendChild(imagenOtra);
+    }
+
+    function etiquetas(e){
+        if(e.value != ""){
+            var contenedorMayor = document.getElementById("contenedor");
+            const useAct = localStorage.getItem("usuarioActual").split("|");
+            perfil = useAct[0];
+            var titulo = document.createElement("h2");
+            titulo.innerText = "Mis Etiquetas";
+            titulo.className = "title text-center";
+            var contenedor = document.createElement("div");
+            contenedor.appendChild(titulo);
+            var tagses = document.getElementById("tagsForm");
+            contenedorMayor.removeChild(tagses);
+
+            var otra = document.getElementById("otraPublicacion");
+            contenedorMayor.removeChild(otra);
+            var otraP = document.createElement("div");
+            otraP.id="otraPublicacion";
+            contenedorMayor.appendChild(otraP);
+
+            var otra = document.getElementById("otroUsuario");
+            contenedorMayor.removeChild(otra);
+            var otraP = document.createElement("div");
+            otraP.id="otroUsuario";
+            contenedorMayor.appendChild(otraP);
+            var publicacionE = document.getElementById("publicacionEtiqueta");
+            contenedorMayor.removeChild(publicacionE);
+            var publicacionEtiqueta = document.createElement("div");
+            publicacionEtiqueta.id="publicacionEtiqueta";
+            contenedorMayor.appendChild(publicacionEtiqueta);
+
+            var todoTag = document.createElement("div");
+            todoTag.id = "tagsForm";
+            contenedor.className = "container container_p rounded w-50 shadow my-3 py-3 contenerPublicacion";
+            const publicacion = document.getElementById("publicacion");
+            publicacion.style.display = "none";
+            const misPublicaciones = document.getElementById("miPublicacion");
+            misPublicaciones.style.display = "none";
+
+            var tagsContainer = document.createElement("div");
+            tagsContainer.className = "container";
+
+            const estudianteActual = localStorage.getItem(perfil).split(",");
+            var lista=[];
+            for(var j = 0; j < estudianteActual.length; j++){
+                var publicacionEstudiante = estudianteActual[j].split("|");
+                var tags = publicacionEstudiante[3].split(";");
+                var pasa = true;
+                for (var i = 0; i < tags.length; i++) {
+                    pasa = true;
+                    for(var k = 0; k < lista.length; k++ ){
+                        if(tags[i] === lista[k])
+                            pasa = false;
+                    }
+                    if(pasa){
+                        lista.unshift(tags[i]);
+                        var tag_1 = document.createElement('span');
+                        const tag_btn = document.createElement('button');
+                        
+                        tag_btn.onclick = function(){buscarEtiqueta(tag_btn);};
+                        
+                        tag_btn.className = "btn p-0 my-3";
+                        tag_1.className = "tag_1";
+                        tag_1.innerHTML = tags[i];
+                        tag_btn.appendChild(tag_1);
+                        tagsContainer.appendChild(tag_btn);
+                    }
+                    contenedor.appendChild(tagsContainer);
+                }
+            }
+            todoTag.appendChild(contenedor);
+            contenedorMayor.appendChild(todoTag);
+        }else{
+            
+        }
+    }
+
+    function buscarEtiqueta(e){
+        const contenedorMayor = document.getElementById("contenedor");
+        var tagses = document.getElementById("tagsForm");
+        contenedorMayor.removeChild(tagses);
+        const tagForm = document.createElement("div");
+        tagForm.id = "tagsForm";
+        contenedorMayor.appendChild(tagForm);
+        const publicacion = document.getElementById("publicacion");
+        publicacion.style.display = "none";
+        const misPublicaciones = document.getElementById("miPublicacion");
+        misPublicaciones.style.display = "none";
+        var publicacionE = document.getElementById("publicacionEtiqueta");
+        contenedorMayor.removeChild(publicacionE);
+        var publicacionEtiqueta = document.createElement("div");
+        publicacionEtiqueta.id="publicacionEtiqueta";
+        contenedorMayor.appendChild(publicacionEtiqueta);
+
+        var otra = document.getElementById("otroUsuario");
+        contenedorMayor.removeChild(otra);
+        var otraP = document.createElement("div");
+        otraP.id="otroUsuario";
+        contenedorMayor.appendChild(otraP);
+        
+        var boton = document.createElement("button");
+        boton = e;
+        const gmails = localStorage.getItem("gmail").split(",");
+        var usuario = "";
+        for(var i = 0; i < gmails.length; i++ ){
+            const user = gmails[i].split("|");
+            if(perfil == user[0])
+                usuario = user[1];
+        }
+        const emails = localStorage.getItem("email").split(",");
+        for(var i = 0; i < emails.length; i++ ){
+            const user = emails[i].split("|");
+            if(perfil == user[0])
+                usuario = user[1];
+        }
+
+        const estudiantePublicaciones = localStorage.getItem(perfil).split(",");
+        for(var i = 0; i < estudiantePublicaciones.length; i++ ){
+            const elementos = estudiantePublicaciones[i].split("|");
+            if(elementos[3].includes(boton.firstChild.innerHTML))
+                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5],false,perfil,usuario,"publicacionEtiqueta",i);
+        }
+        console.log("Perfil: " + perfil);
+        console.log("Usuario: " + usuario);
+        console.log(boton.firstChild.innerHTML);
     }
 
     return(
@@ -447,7 +588,7 @@ function Principal(){
                         <div className="col-1">
                             <i className="fas fa-book img-fluid principal_f"></i>
                         </div>
-                        <a className="navbar-brand" href="#">UniApuntes</a>
+                        <button className="btn navbar-brand" onClick={window.onload}>UniApuntes</button>
                         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                         </button>
@@ -460,7 +601,7 @@ function Principal(){
                                     <button className="btn nav-link" onClick ={window.onload}>Mis Apuntes</button>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="#" >Etiquetas</a>
+                                    <button className="btn nav-link" onClick = {etiquetas} >Etiquetas</button>
                                 </li>
                                 <li className="nav-item">
                                     <button className="btn nav-link" href="#" tabIndex="-1" onClick={cerrarSesion}>Cerrar Sesión</button>
@@ -482,6 +623,8 @@ function Principal(){
             <div id="miPublicacion"></div>
             <div id="otraPublicacion"></div>
             <div id="otroUsuario"></div>
+            <div id="tagsForm"></div>
+            <div id="publicacionEtiqueta"></div>
         </div>
     );
 }
