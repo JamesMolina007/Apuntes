@@ -8,67 +8,76 @@ import GoogleLogin from 'react-google-login';
 function Login(){
     let history = useHistory();
     const respuestaGoogle=(respuesta)=>{
-        var existe = false;
-        if(localStorage.getItem('email')){  
-            var correos = localStorage.getItem('email').split(",");
-            for (var i = 0; i < correos.length; i++) {
-                var usuario = correos[i].split("|");
-                if(usuario[0] == respuesta.Ft.pu){
-                    existe = true;
-                    window.alert("Usuario ya existente");
-                }
-             }
-             if(!existe){
-                    if(localStorage.getItem('gmail')){
-                        var correosG = localStorage.getItem('gmail').split(",");
-                        for (var i = 0; i < correosG.length; i++) {
-                            var usuarioG = correosG[i].split("|");
-                            if(usuarioG[0] == respuesta.Ft.pu){
-                                existe = true;
-                                window.alert("Usuario ya existente");
-                                localStorage.removeItem('usuarioActual');
-                                const usuarioActual = respuesta.Ft.pu + "|" +usuarioG[1];
-                                localStorage.setItem('usuarioActual',usuarioActual);
-                                history.push("/principal");
-                            }
-                        }
-                    }
-                    if(!existe){
-                        const cadena = respuesta.Ft.pu +"|"+respuesta.Ft.Ve;
-                        if(localStorage.getItem('gmail')){            
-                            localStorage.setItem('gmail', localStorage.getItem('gmail') + ',' + cadena);
-                        }else{
-                            localStorage.setItem('gmail',cadena);
-                        }    
-                        console.log("Usuario no existente");
-                    }
-             }
+    var existe = false;
+    if(localStorage.getItem('email')){ 
+        var correos = localStorage.getItem('email').split(",");
+        for (var i = 0; i < correos.length; i++) {
+            var usuario = correos[i].split("|");
+            if(usuario[0] == respuesta.Ft.pu){
+                existe = true;
+                window.alert("Usuario ya existente");
+            }
         }
+    }
+    if(!existe){
+        console.log("Usuario no existente");
+        if(localStorage.getItem('gmail')){
+        var correosG = localStorage.getItem('gmail').split(",");
+        for (var i = 0; i < correosG.length; i++) {
+            var usuarioG = correosG[i].split("|");
+            if(usuarioG[0] == respuesta.Ft.pu){
+                existe = true;
+                localStorage.removeItem('usuarioActual');
+                const usuarioActual = respuesta.Ft.pu + "|" +usuarioG[1];
+                localStorage.setItem('usuarioActual',usuarioActual);
+                history.push("/principal");
+            }
+        }
+    }
+    if(!existe){
+        const cadena = respuesta.Ft.pu +"|"+respuesta.Ft.Ve;
+        if(localStorage.getItem('gmail')){            
+            localStorage.setItem('gmail', localStorage.getItem('gmail') + ',' + cadena);
+            localStorage.removeItem('usuarioActual');
+            localStorage.setItem('usuarioActual',cadena);
+            history.push("/principal");
+        }else{
+            console.log("Entró");
+            localStorage.setItem('gmail',cadena);
+            localStorage.removeItem('usuarioActual');
+            localStorage.setItem('usuarioActual',cadena);
+            history.push("/principal");
+        }    
+        console.log("Usuario no existente");
+    }   
         console.log(respuesta.Ft.pu);
         console.log(respuesta.Ft.Ve);
     }
+}
     function iniciar(e){
         e.preventDefault();
         const user = document.getElementById('correo').value;
         const pass = document.getElementById('contrasena').value;
-        var correos = localStorage.getItem('email').split(",");
-        var ingreso = false;
-        var userAct;
-        for (var i = 0; i < correos.length; i++) {
-            var usuario = correos[i].split("|");
-            if(usuario[0] == user && usuario[2] == pass){
-                ingreso = true;
-                userAct = usuario[1];
+        if(localStorage.getItem('email')){
+            var correos = localStorage.getItem('email').split(",");
+            var ingreso = false;
+            var userAct;
+            for (var i = 0; i < correos.length; i++) {
+                var usuario = correos[i].split("|");
+                if(usuario[0] == user && usuario[2] == pass){
+                    ingreso = true;
+                    userAct = usuario[1];
+                }
             }
-        }
-        if(ingreso){
-            const usuarioActual = user + "|" + userAct;
-            localStorage.removeItem('usuarioActual');
-            localStorage.setItem('usuarioActual',usuarioActual);
-            console.log('Ingresó correctamente');
-            history.push("/principal");
-        }else{
-            window.alert("Usuario y/o contraseña incorrecta");
+            if(ingreso){
+                const usuarioActual = user + "|" + userAct;
+                localStorage.removeItem('usuarioActual');
+                localStorage.setItem('usuarioActual',usuarioActual);
+                console.log('Ingresó correctamente');
+                history.push("/principal");
+            }else{
+                window.alert("Usuario y/o contraseña incorrecta");
+            }
         }
     }
     return(

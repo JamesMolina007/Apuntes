@@ -148,7 +148,8 @@ function Principal(){
         const otroUsuario = document.getElementById("otroUsuario");
         otroUsuario.style.display = "none";
         const tagses = document.getElementById("tagsForm");
-        tagses.style.display = "none";
+        if(tagses)
+            tagses.style.display = "none";
     }
 
     function subir(e){
@@ -190,7 +191,8 @@ function Principal(){
             otrosTags.id ="publicacionEtiqueta";    
             content.appendChild(otrosTags);
             content.removeChild(publicaciones);
-            content.removeChild(tages);
+            if(tages)
+                content.removeChild(tages);
             content.removeChild(otras);
 
             const otraPublicacion = document.createElement("div");
@@ -218,50 +220,54 @@ function Principal(){
             list.appendChild(label);
             list.appendChild(find);
             var encontrados = 0;
-            const userInfoG = localStorage.getItem("gmail").split(",");
-            for( var i = 0; i < userInfoG.length; i++ ){
-                var datos = userInfoG[i].split("|");
-                if( datos[0].includes(usuario) || datos[1].includes(usuario) ){
-                    encontrados++;
-                    const usuarioEncontrado = document.createElement("button");
-                    usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
-                    usuarioEncontrado.className = "list-group-item list-group-item-action my-1";
-                    const lbl_Nombre = document.createElement("label");
-                    const lbl_Correo = document.createElement("label");
-                    const br = document.createElement("br");
-                    lbl_Nombre.innerHTML = datos[1];
-                    lbl_Correo.innerHTML = datos[0];
-                    usuarioEncontrado.appendChild(lbl_Nombre);
-                    usuarioEncontrado.appendChild(br);
-                    usuarioEncontrado.appendChild(lbl_Correo);
-                    list.appendChild(usuarioEncontrado);
+            if(localStorage.getItem("gmail")){
+                const userInfoG = localStorage.getItem("gmail").split(",");
+                for( var i = 0; i < userInfoG.length; i++ ){
+                    var datos = userInfoG[i].split("|");
+                    if( datos[0].includes(usuario) || datos[1].includes(usuario) ){
+                        encontrados++;
+                        const usuarioEncontrado = document.createElement("button");
+                        usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
+                        usuarioEncontrado.className = "list-group-item list-group-item-action my-1";
+                        const lbl_Nombre = document.createElement("label");
+                        const lbl_Correo = document.createElement("label");
+                        const br = document.createElement("br");
+                        lbl_Nombre.innerHTML = datos[1];
+                        lbl_Correo.innerHTML = datos[0];
+                        usuarioEncontrado.appendChild(lbl_Nombre);
+                        usuarioEncontrado.appendChild(br);
+                        usuarioEncontrado.appendChild(lbl_Correo);
+                        list.appendChild(usuarioEncontrado);
+                    }
                 }
             }
-            const userInfo = localStorage.getItem("email").split(",");
-            for( var i = 0; i < userInfo.length; i++ ){
-                var datos = userInfo[i].split("|");
-                if( datos[0].includes(usuario) || datos[1].includes(usuario) ){
-                    encontrados++;
-                    const usuarioEncontrado = document.createElement("button");
-                    usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
-                    usuarioEncontrado.className = "list-group-item list-group-item-action my-1";
-                    const lbl_Nombre = document.createElement("label");
-                    const lbl_Correo = document.createElement("label");
-                    const br = document.createElement("br");
-                    lbl_Nombre.innerHTML = datos[1];
-                    lbl_Correo.innerHTML = datos[0];
-                    usuarioEncontrado.appendChild(lbl_Nombre);
-                    usuarioEncontrado.appendChild(br);
-                    usuarioEncontrado.appendChild(lbl_Correo);
-                    list.appendChild(usuarioEncontrado);
+            if(localStorage.getItem("email")){
+                const userInfo = localStorage.getItem("email").split(",");
+                for( var i = 0; i < userInfo.length; i++ ){
+                    var datos = userInfo[i].split("|");
+                    if( datos[0].includes(usuario) || datos[1].includes(usuario) ){
+                        encontrados++;
+                        const usuarioEncontrado = document.createElement("button");
+                        usuarioEncontrado.onclick = function() {btn_buscar(usuarioEncontrado);};
+                        usuarioEncontrado.className = "list-group-item list-group-item-action my-1";
+                        const lbl_Nombre = document.createElement("label");
+                        const lbl_Correo = document.createElement("label");
+                        const br = document.createElement("br");
+                        lbl_Nombre.innerHTML = datos[1];
+                        lbl_Correo.innerHTML = datos[0];
+                        usuarioEncontrado.appendChild(lbl_Nombre);
+                        usuarioEncontrado.appendChild(br);
+                        usuarioEncontrado.appendChild(lbl_Correo);
+                        list.appendChild(usuarioEncontrado);
+                    }
                 }
+                label.innerHTML = "Busqueda para: " + usuario;
+                find.innerHTML = "Resultados Encontrados: " + encontrados;
+                contenedor.appendChild(list);
+                otraP.appendChild(contenedor);
+                const busquedaUs = document.getElementById("buscar")
+                busquedaUs.value = "";
             }
-            label.innerHTML = "Busqueda para: " + usuario;
-            find.innerHTML = "Resultados Encontrados: " + encontrados;
-            contenedor.appendChild(list);
-            otraP.appendChild(contenedor);
-            const busquedaUs = document.getElementById("buscar")
-            busquedaUs.value = "";
         }
     }
 
@@ -465,7 +471,8 @@ function Principal(){
             var contenedor = document.createElement("div");
             contenedor.appendChild(titulo);
             var tagses = document.getElementById("tagsForm");
-            contenedorMayor.removeChild(tagses);
+            if(tagses)
+                contenedorMayor.removeChild(tagses);
 
             var otra = document.getElementById("otraPublicacion");
             contenedorMayor.removeChild(otra);
@@ -495,36 +502,38 @@ function Principal(){
             var tagsContainer = document.createElement("div");
             tagsContainer.className = "container";
 
-            const estudianteActual = localStorage.getItem(perfil).split(",");
-            var lista=[];
-            for(var j = 0; j < estudianteActual.length; j++){
-                var publicacionEstudiante = estudianteActual[j].split("|");
-                var tags = publicacionEstudiante[3].split(";");
-                var pasa = true;
-                for (var i = 0; i < tags.length; i++) {
-                    pasa = true;
-                    for(var k = 0; k < lista.length; k++ ){
-                        if(tags[i] === lista[k])
-                            pasa = false;
+            if(localStorage.getItem(perfil)){
+                const estudianteActual = localStorage.getItem(perfil).split(",");
+                var lista=[];
+                for(var j = 0; j < estudianteActual.length; j++){
+                    var publicacionEstudiante = estudianteActual[j].split("|");
+                    var tags = publicacionEstudiante[3].split(";");
+                    var pasa = true;
+                    for (var i = 0; i < tags.length; i++) {
+                        pasa = true;
+                        for(var k = 0; k < lista.length; k++ ){
+                            if(tags[i] === lista[k])
+                                pasa = false;
+                        }
+                        if(pasa){
+                            lista.unshift(tags[i]);
+                            var tag_1 = document.createElement('span');
+                            const tag_btn = document.createElement('button');
+                            
+                            tag_btn.onclick = function(){buscarEtiqueta(tag_btn);};
+                            
+                            tag_btn.className = "btn p-0 my-3";
+                            tag_1.className = "tag_1";
+                            tag_1.innerHTML = tags[i];
+                            tag_btn.appendChild(tag_1);
+                            tagsContainer.appendChild(tag_btn);
+                        }
+                        contenedor.appendChild(tagsContainer);
                     }
-                    if(pasa){
-                        lista.unshift(tags[i]);
-                        var tag_1 = document.createElement('span');
-                        const tag_btn = document.createElement('button');
-                        
-                        tag_btn.onclick = function(){buscarEtiqueta(tag_btn);};
-                        
-                        tag_btn.className = "btn p-0 my-3";
-                        tag_1.className = "tag_1";
-                        tag_1.innerHTML = tags[i];
-                        tag_btn.appendChild(tag_1);
-                        tagsContainer.appendChild(tag_btn);
-                    }
-                    contenedor.appendChild(tagsContainer);
                 }
+                todoTag.appendChild(contenedor);
+                contenedorMayor.appendChild(todoTag);
             }
-            todoTag.appendChild(contenedor);
-            contenedorMayor.appendChild(todoTag);
         }else{
             
         }
@@ -533,7 +542,8 @@ function Principal(){
     function buscarEtiqueta(e){
         const contenedorMayor = document.getElementById("contenedor");
         var tagses = document.getElementById("tagsForm");
-        contenedorMayor.removeChild(tagses);
+        if(tagses)
+            contenedorMayor.removeChild(tagses);
         const tagForm = document.createElement("div");
         tagForm.id = "tagsForm";
         contenedorMayor.appendChild(tagForm);
@@ -555,29 +565,31 @@ function Principal(){
         
         var boton = document.createElement("button");
         boton = e;
-        const gmails = localStorage.getItem("gmail").split(",");
-        var usuario = "";
-        for(var i = 0; i < gmails.length; i++ ){
-            const user = gmails[i].split("|");
-            if(perfil == user[0])
-                usuario = user[1];
+        if(localStorage.getItem("gmail")){
+            const gmails = localStorage.getItem("gmail").split(",");
+            var usuario = "";
+            for(var i = 0; i < gmails.length; i++ ){
+                const user = gmails[i].split("|");
+                if(perfil == user[0])
+                    usuario = user[1];
+            }
         }
-        const emails = localStorage.getItem("email").split(",");
-        for(var i = 0; i < emails.length; i++ ){
-            const user = emails[i].split("|");
-            if(perfil == user[0])
-                usuario = user[1];
+        if(localStorage.getItem("email")){
+            const emails = localStorage.getItem("email").split(",");
+            for(var i = 0; i < emails.length; i++ ){
+                const user = emails[i].split("|");
+                if(perfil == user[0])
+                    usuario = user[1];
+            }
         }
-
-        const estudiantePublicaciones = localStorage.getItem(perfil).split(",");
-        for(var i = 0; i < estudiantePublicaciones.length; i++ ){
-            const elementos = estudiantePublicaciones[i].split("|");
-            if(elementos[3].includes(boton.firstChild.innerHTML))
-                append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5],false,perfil,usuario,"publicacionEtiqueta",i);
+        if(localStorage.getItem(perfil)){
+            const estudiantePublicaciones = localStorage.getItem(perfil).split(",");
+            for(var i = 0; i < estudiantePublicaciones.length; i++ ){
+                const elementos = estudiantePublicaciones[i].split("|");
+                if(elementos[3].includes(boton.firstChild.innerHTML))
+                    append(elementos[1],elementos[2],elementos[3],elementos[4],elementos[5],false,perfil,usuario,"publicacionEtiqueta",i);
+            }
         }
-        console.log("Perfil: " + perfil);
-        console.log("Usuario: " + usuario);
-        console.log(boton.firstChild.innerHTML);
     }
 
     return(
