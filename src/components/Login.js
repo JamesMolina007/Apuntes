@@ -8,12 +8,13 @@ import GoogleLogin from 'react-google-login';
 function Login(){
     let history = useHistory();
     const respuestaGoogle=(respuesta)=>{
+    console.log(respuesta);
     var existe = false;
     if(localStorage.getItem('email')){ 
         var correos = localStorage.getItem('email').split(",");
         for (var i = 0; i < correos.length; i++) {
             var usuario = correos[i].split("|");
-            if(usuario[0] == respuesta.Ft.pu){
+            if(usuario[0] == respuesta.dt.Nt){
                 existe = true;
                 window.alert("Usuario ya existente");
             }
@@ -25,17 +26,17 @@ function Login(){
         var correosG = localStorage.getItem('gmail').split(",");
         for (var i = 0; i < correosG.length; i++) {
             var usuarioG = correosG[i].split("|");
-            if(usuarioG[0] == respuesta.Ft.pu){
+            if(usuarioG[0] == respuesta.dt.Nt){
                 existe = true;
                 localStorage.removeItem('usuarioActual');
-                const usuarioActual = respuesta.Ft.pu + "|" +usuarioG[1];
+                const usuarioActual = respuesta.dt.Nt + "|" +usuarioG[1];
                 localStorage.setItem('usuarioActual',usuarioActual);
                 history.push("/principal");
             }
         }
     }
     if(!existe){
-        const cadena = respuesta.Ft.pu +"|"+respuesta.Ft.Ve;
+        const cadena = respuesta.dt.Nt +"|"+respuesta.dt.Ve;
         if(localStorage.getItem('gmail')){            
             localStorage.setItem('gmail', localStorage.getItem('gmail') + ',' + cadena);
             localStorage.removeItem('usuarioActual');
@@ -50,8 +51,8 @@ function Login(){
         }    
         console.log("Usuario no existente");
     }   
-        console.log(respuesta.Ft.pu);
-        console.log(respuesta.Ft.Ve);
+        console.log(respuesta.dt.Nt);
+        console.log(respuesta.dt.Ve);
     }
 }
     function iniciar(e){
